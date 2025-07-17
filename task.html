@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GREEN-API Client</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    input, button, textarea { width: 100%; margin: 10px 0; padding: 8px; font-size: 1rem; }
+    textarea { height: 150px; resize: none; }
+  </style>
+</head>
+<body>
+  <h1>GREEN-API HTML Client</h1>
+
+  <label for="idInstance">idInstance:</label>
+  <input type="text" id="idInstance" placeholder="Enter idInstance">
+
+  <label for="apiToken">ApiTokenInstance:</label>
+  <input type="text" id="apiToken" placeholder="Enter ApiTokenInstance">
+
+  <button onclick="callAPI('getSettings')">getSettings</button>
+  <button onclick="callAPI('getStateInstance')">getStateInstance</button>
+
+  <h3>Send Message</h3>
+  <label for="phone">Phone number (with country code):</label>
+  <input type="text" id="phone" placeholder="e.g. 77001112233">
+
+  <label for="message">Message:</label>
+  <input type="text" id="message" placeholder="Hello from Green API!">
+  <button onclick="sendMessage()">sendMessage</button>
+
+  <h3>Send File by URL</h3>
+  <label for="fileUrl">File URL:</label>
+  <input type="text" id="fileUrl" placeholder="https://example.com/file.pdf">
+  <label for="caption">Caption:</label>
+  <input type="text" id="caption" placeholder="File description">
+  <button onclick="sendFileByUrl()">sendFileByUrl</button>
+
+  <h2>Response:</h2>
+  <textarea id="response" readonly></textarea>
+
+  <script>
+    async function callAPI(method) {
+      const id = document.getElementById("idInstance").value.trim();
+      const token = document.getElementById("apiToken").value.trim();
+      const url = `https://api.green-api.com/waInstance${id}/${method}/${token}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        document.getElementById("response").value = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("response").value = "Error: " + err;
+      }
+    }
+
+    async function sendMessage() {
+      const id = document.getElementById("idInstance").value.trim();
+      const token = document.getElementById("apiToken").value.trim();
+      const phone = document.getElementById("phone").value.trim() + "@c.us";
+      const message = document.getElementById("message").value.trim();
+      const url = `https://api.green-api.com/waInstance${id}/sendMessage/${token}`;
+
+      const body = JSON.stringify({ chatId: phone, message });
+
+      try {
+        const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body });
+        const data = await res.json();
+        document.getElementById("response").value = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("response").value = "Error: " + err;
+      }
+    }
+
+    async function sendFileByUrl() {
+      const id = document.getElementById("idInstance").value.trim();
+      const token = document.getElementById("apiToken").value.trim();
+      const phone = document.getElementById("phone").value.trim() + "@c.us";
+      const fileUrl = document.getElementById("fileUrl").value.trim();
+      const caption = document.getElementById("caption").value.trim();
+
+      const url = `https://api.green-api.com/waInstance${id}/sendFileByUrl/${token}`;
+
+      const body = JSON.stringify({ chatId: phone, urlFile: fileUrl, fileName: "file", caption });
+
+      try {
+        const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body });
+        const data = await res.json();
+        document.getElementById("response").value = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("response").value = "Error: " + err;
+      }
+    }
+  </script>
+</body>
+</html>
